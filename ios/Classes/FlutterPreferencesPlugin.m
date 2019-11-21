@@ -9,8 +9,7 @@ static NSString *const CHANNEL_NAME = @"flutter_preferences";
                                                               binaryMessenger:registrar.messenger];
   [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
     NSString *method = [call method];
-    NSDictionary *arguments = [call arguments];
-
+    NSDictionary *arguments = [call arguments];    
     if ([method isEqualToString:@"getAll"]) {
       result(getAllPrefs());
     } else if ([method isEqualToString:@"setBool"]) {
@@ -69,10 +68,8 @@ static NSMutableDictionary *getAllPrefs() {
   NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] persistentDomainForName:appDomain];
   NSMutableDictionary *filteredPrefs = [NSMutableDictionary dictionary];
   if (prefs != nil) {
-    for (NSString *candidateKey in prefs) {
-      if ([candidateKey hasPrefix:@"flutter."]) {
-        [filteredPrefs setObject:prefs[candidateKey] forKey:candidateKey];
-      }
+    for (NSString *candidateKey in prefs) {      
+        [filteredPrefs setObject:prefs[candidateKey] forKey:candidateKey];      
     }
   }
   return filteredPrefs;
