@@ -8,7 +8,9 @@ class FlutterPreferenceHelper {
   Map<String, _FlutterPreferences> _preferenceMap;
 
   static final FlutterPreferenceHelper _instance = FlutterPreferenceHelper._();
+
   factory FlutterPreferenceHelper() => _instance;
+
   FlutterPreferenceHelper._();
 
   Future init(List<String> prefs) async {
@@ -48,10 +50,10 @@ class _FlutterPreferences {
     if (prefName == null || prefName.isEmpty || prefName == 'default') {
       prefName = null;
     }
-    var map = await _kChannel
-        .invokeMapMethod<String, Object>('getAll', <String, dynamic>{
+    var map = await _kChannel.invokeMethod('getAll', <String, dynamic>{
       'pref_name': prefName,
     });
+    map = new Map<String, dynamic>.from(map);
     return _FlutterPreferences._(prefName, map);
   }
 
@@ -156,8 +158,8 @@ class _FlutterPreferences {
   }
 
   Future<Map<String, Object>> _getSPMap() async {
-    final Map<String, Object> fromSystem = await _kChannel
-        .invokeMapMethod<String, Object>('getAll', <String, dynamic>{
+    final Map<String, Object> fromSystem =
+        await _kChannel.invokeMapMethod('getAll', <String, dynamic>{
       'pref_name': _prefName,
     });
     assert(fromSystem != null);

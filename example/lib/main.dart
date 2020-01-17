@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_preferences/flutter_preferences.dart';
 
 void main() async {
-  await FlutterPreferenceHelper().init(['DCC']);
+  await FlutterPreferenceHelper().init(['Named_Pref']);
 
   runApp(MyApp());
 }
@@ -20,13 +20,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    clickCount = FlutterPreferenceHelper().named('DCC').getInt('clicked');
+    clickCount = FlutterPreferenceHelper().named('Named_Pref').getInt('some_int');
     if (clickCount == null) clickCount = 0;
   }
 
   Future setValueDCC(int value) async {
-    var prefs = FlutterPreferenceHelper().named('DCC');
-    prefs.setInt('clicked', value);
+    var prefs = FlutterPreferenceHelper().named('Named_Pref');
+    prefs.setInt('some_int', value);
   }
 
   Future setValueDefault(String pref) async {
@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
         body: Center(
             child: Column(
           children: <Widget>[
-            Text('Get Value DCC: $clickCount'),
+            Text('Get Value from Named_Pref: $clickCount'),
             Text(
                 'Get Value default: ${FlutterPreferenceHelper().getDefault().getString('name')}'),
             RaisedButton(
@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
                 setValueDCC(clickCount);
                 setState(() {});
               },
-              child: Text('Set Value DCC clicked $clickCount'),
+              child: Text('Set Value Named_Pref clicked ${FlutterPreferenceHelper().named('Named_Pref').getInt('some_int')}'),
             ),
             RaisedButton(
               onPressed: () {
