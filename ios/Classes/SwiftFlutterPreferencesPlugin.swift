@@ -61,7 +61,7 @@ public class SwiftFlutterPreferencesPlugin: NSObject, FlutterPlugin {
         let prefs = getAllPrefs()
         if prefs.count != 0 {
             for key in prefs {
-                userDefaults.removeObject(forKey: key.key );
+                userDefaults.removeObject(forKey: key.key as! String );
             }
         }
         UserDefaults.standard.synchronize()
@@ -73,7 +73,7 @@ public class SwiftFlutterPreferencesPlugin: NSObject, FlutterPlugin {
   }
 }
 
-fileprivate func getAllPrefs() -> Dictionary<String, Any> {
+fileprivate func getAllPrefs() -> NSMutableDictionary {
     let appDomain:String = Bundle.main.bundleIdentifier ?? ""
     let prefs:Dictionary<String, Any> = UserDefaults.standard.persistentDomain(forName: appDomain) ?? [:]
     let filteredPrefs = NSMutableDictionary()
@@ -82,5 +82,5 @@ fileprivate func getAllPrefs() -> Dictionary<String, Any> {
             filteredPrefs.setObject(prefs[candidateKey.key]!, forKey: candidateKey.key as NSCopying)
         }
     }
-    return prefs
+    return filteredPrefs
 }
