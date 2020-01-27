@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_preferences/flutter_preferences.dart';
 
-void main() async {
+void main() async {  
+  WidgetsFlutterBinding.ensureInitialized();
   await FlutterPreferenceHelper().init(['Named_Pref']);
 
   runApp(MyApp());

@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-const MethodChannel _kChannel = const MethodChannel('flutter_preferences');
-
 class FlutterPreferenceHelper {
   Map<String, _FlutterPreferences> _preferenceMap;
 
@@ -46,11 +44,14 @@ class _FlutterPreferences {
 
   _FlutterPreferences._(this._prefName, this._preferenceCache);
 
+  static const MethodChannel _channel =
+      const MethodChannel('flutter_preferences');
+
   static Future<_FlutterPreferences> getInstance({String prefName}) async {
     if (prefName == null || prefName.isEmpty || prefName == 'default') {
       prefName = null;
     }
-    var map = await _kChannel.invokeMethod('getAll', <String, dynamic>{
+    var map = await _channel.invokeMethod('getAll', <String, dynamic>{
       'pref_name': prefName,
     });
     map = new Map<String, dynamic>.from(map);
@@ -122,7 +123,7 @@ class _FlutterPreferences {
     };
     if (value == null) {
       _preferenceCache.remove(key);
-      return _kChannel
+      return _channel
           .invokeMethod<bool>('remove', params)
           .then<bool>((dynamic result) => result);
     } else {
@@ -130,7 +131,7 @@ class _FlutterPreferences {
 
       params['value'] = value;
       params['pref_name'] = _prefName;
-      return _kChannel
+      return _channel
           .invokeMethod<bool>('set$valueType', params)
           .then<bool>((dynamic result) => result);
     }
@@ -139,12 +140,12 @@ class _FlutterPreferences {
   /// Always returns true.
   /// On iOS, synchronize is marked deprecated. On Android, we commit every set.
   @deprecated
-  Future<bool> commit() async => await _kChannel.invokeMethod<bool>('commit');
+  Future<bool> commit() async => await _channel.invokeMethod<bool>('commit');
 
   /// Completes with true once the user preferences for the app has been cleared.
   Future<bool> clear() async {
     _preferenceCache.clear();
-    return await _kChannel.invokeMethod<bool>('clear');
+    return await _channel.invokeMethod<bool>('clear');
   }
 
   /// Fetches the latest values from the host platform.
@@ -159,7 +160,7 @@ class _FlutterPreferences {
 
   Future<Map<String, Object>> _getSPMap() async {
     final Map<String, Object> fromSystem =
-        await _kChannel.invokeMapMethod('getAll', <String, dynamic>{
+        await _channel.invokeMapMethod('getAll', <String, dynamic>{
       'pref_name': _prefName,
     });
     assert(fromSystem != null);
