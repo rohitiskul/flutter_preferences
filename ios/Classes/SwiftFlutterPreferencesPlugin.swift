@@ -3,7 +3,8 @@ import UIKit
 
 public class SwiftFlutterPreferencesPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_preferences", binaryMessenger: registrar.messenger())
+    let readerWriterCodec:PreferencesReaderWriter = PreferencesReaderWriter()
+    let channel = FlutterMethodChannel(name: "flutter_preferences", binaryMessenger: registrar.messenger(),codec: FlutterStandardMethodCodec(readerWriter: readerWriterCodec))
     let instance = SwiftFlutterPreferencesPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }
@@ -59,9 +60,9 @@ public class SwiftFlutterPreferencesPlugin: NSObject, FlutterPlugin {
     case "clear":
         let userDefaults:UserDefaults = UserDefaults.standard
         let prefs = getAllPrefs()
-        if prefs.count != 0 {
-            for key in prefs {
-                userDefaults.removeObject(forKey: key.key as! String );
+        if prefs!.count != 0 {
+            for key in prefs! {
+                userDefaults.removeObject(forKey: key.key );
             }
         }
         UserDefaults.standard.synchronize()
@@ -73,14 +74,8 @@ public class SwiftFlutterPreferencesPlugin: NSObject, FlutterPlugin {
   }
 }
 
-fileprivate func getAllPrefs() -> NSMutableDictionary {
+fileprivate func getAllPrefs() -> [String:Any]? {
     let appDomain:String = Bundle.main.bundleIdentifier ?? ""
     let prefs:Dictionary<String, Any> = UserDefaults.standard.persistentDomain(forName: appDomain) ?? [:]
-    let filteredPrefs = NSMutableDictionary()
-    if(!prefs.isEmpty) {
-        for candidateKey in prefs {
-            filteredPrefs.setObject(prefs[candidateKey.key]!, forKey: candidateKey.key as NSCopying)
-        }
-    }
-    return filteredPrefs
+    return prefs
 }

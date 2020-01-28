@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class FlutterPreferenceHelper {
@@ -44,8 +45,9 @@ class _FlutterPreferences {
 
   _FlutterPreferences._(this._prefName, this._preferenceCache);
 
-  static const MethodChannel _channel =
-      const MethodChannel('flutter_preferences');
+  static const MethodChannel _channel = const MethodChannel(
+      'flutter_preferences',
+      const StandardMethodCodec(const _PreferencesMessageCodec()));
 
   static Future<_FlutterPreferences> getInstance({String prefName}) async {
     if (prefName == null || prefName.isEmpty || prefName == 'default') {
@@ -170,5 +172,30 @@ class _FlutterPreferences {
       preferencesMap[key] = fromSystem[key];
     }
     return preferencesMap;
+  }
+}
+
+class _PreferencesMessageCodec extends StandardMessageCodec {
+  static const int _kDateTime = 128;
+
+  const _PreferencesMessageCodec();
+
+  @override
+  void writeValue(WriteBuffer buffer, dynamic value) {
+    if (value is DateTime) {
+      buffer.putUint8(_kDateTime);
+      buffer.putInt64(value.millisecondsSinceEpoch);
+    } else {
+      super.writeValue(buffer, value);
+    }
+  }
+
+  @override
+  dynamic readValueOfType(int type, ReadBuffer buffer) {
+    if (type == _kDateTime) {
+      return new DateTime.fromMillisecondsSinceEpoch(buffer.getInt64());
+    } else {
+      return super.readValueOfType(type, buffer);
+    }
   }
 }
